@@ -1,0 +1,17 @@
+# OK THIS IS GOING TO BE REALLY DIFFERENT BUT I DON'T KNOW HOW YET
+#***************** DEBUG THIS
+set_io the_led 95
+set_io o_led0 99
+set_io o_led1 98
+set_io o_led2 97
+set_io o_led3 96
+set_io i_clk 21
+set_io the_button 44
+set_io i_bit7 119
+set_io i_bit6 118
+set_io i_bit5 117
+set_io i_bit4 116
+set_io i_bit3 115
+set_io i_bit2 114
+set_io i_bit1 113
+set_io i_bit0 112

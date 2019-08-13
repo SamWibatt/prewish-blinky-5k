@@ -1,0 +1,8 @@
+*.asc
+*.vcd
+*.vvp
+*.fst
+*_out.txt
+*_err.txt
+*.bin
+prewish5k.json
