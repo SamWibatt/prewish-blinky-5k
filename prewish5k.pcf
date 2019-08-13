@@ -1,5 +1,8 @@
 # OK THIS IS GOING TO BE REALLY DIFFERENT BUT I DON'T KNOW HOW YET
 #***************** DEBUG THIS
+# but yeah, 48 pin package doesn't have pins 95-119 that I'm using.
+# maybe the button can still be pin 44! Time to find that upduino pinout.
+# indeed it looks like I can! Follow also osresearch's upduino_v2.pcf (in images folder atm)
 set_io the_led 95
 set_io o_led0 99
 set_io o_led1 98
