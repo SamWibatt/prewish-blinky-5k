@@ -115,19 +115,22 @@ module prewish5k_controller(
     // so need to get rid of it
     parameter NEWMASK_CLK_BITS=28;		//default for "build"
 	parameter BLINKY_MASK_CLK_BITS = NEWMASK_CLK_BITS - 7;	//default for build, swh //3;			//default for short sim
+	wire acthi_led;		//the LED wire coming out from the blinky - we need to negate for active low
 	prewish5k_blinky #(.SYSCLK_DIV_BITS(BLINKY_MASK_CLK_BITS)) blinky (		//can I do this to cascade parameterization from controller decl in prewish5k_tb? looks like!
         .CLK_I(CLK_O),
         .RST_I(RST_O),
         .STB_I(strobe),
 		.DAT_I(data),			//should be data - making this mask didn't fix the trouble
 		.o_alive(blinky_alive),
-		.o_led(~the_led)		//sean changes for active low - can you do this?
+		.o_led(acthi_led)		//was ~the_led)		//sean changes for active low - can you do this?
 		// i imagine not, it's not very lvaluey-looking. but a) I'm curious to see what this does
 		// and b) even if it doesn't work, I want to do the negating at this level so the modules
 		// can be active high everything. I could just declare another wire to use here, then
 		// assign the_led to ~that.
+		// and indeed:
+		// prewish5k_controller.v:124: error: expression not valid in assign l-value: ~(the_led)
     );
-
+	assign the_led = ~acthi_led;	//this works in sim!
 
   //debouncer
   reg debounce_in_strobe = 0;
