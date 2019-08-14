@@ -60,12 +60,16 @@ module prewish5k_tb;
 	//primitive for routing iceStick's onboard clock to a global buffer, which is good for clocks
   //because GBs can drive a lot more little modules
     wire CLK_O;
+	
+	//hx1k way
+	/*
     SB_GB clk_gb (
 		.USER_SIGNAL_TO_GLOBAL_BUFFER(clk),
 		.GLOBAL_BUFFER_OUTPUT(CLK_O)             //can I use the output like this?
     );
+	*/
 
-
+	//HOW DO WE SET UP A CLOCK?
 
     //module prewish5k_controller(
     //    input i_clk,

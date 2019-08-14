@@ -11,15 +11,15 @@
 // MAIN ********************************************************************************************************************************************
 module prewish5k_controller(
     input i_clk,
-    input the_button,       //pin 44 active LOW button? Pulled up and inverted in here. Pin 119
-    input i_bit7,           // 119 dip swicth swicths, active low. Will pull up but not debounce.
-    input i_bit6,           // 118
-    input i_bit5,           // 117
-    input i_bit4,           // 116
-    input i_bit3,           // 115
-    input i_bit2,           // 114
-    input i_bit1,           // 113
-    input i_bit0,           // 112
+    input the_button,       //active LOW button? Pulled up and inverted in here.
+    input i_bit7,           // dip swicth swicths, active low. Will pull up but not debounce.
+    input i_bit6,           
+    input i_bit5,           
+    input i_bit4,           
+    input i_bit3,           
+    input i_bit2,           
+    input i_bit1,           
+    input i_bit0,           
 
 	output the_led,			//this is THE LED, the green one that follows the pattern
 	output o_led0,			//these others are just the other LEDs on the board and they
@@ -28,6 +28,7 @@ module prewish5k_controller(
 	output o_led3
 );
 
+	
     // INPUT BUTTON - after https://discourse.tinyfpga.com/t/internal-pullup-in-bx/800
     wire button_internal;
     SB_IO #(
