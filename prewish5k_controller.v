@@ -63,10 +63,11 @@ module prewish5k_controller(
 	wire mentor_alive;
     wire debounce_alive;
 
-	assign o_led3 = debounce_alive;                //otherLEDs[3];
-	assign o_led2 = mentor_alive;	               //otherLEDs[2];
-	assign o_led1 = blinky_alive;                  //otherLEDs[1];
-	assign o_led0 = redblinkct[REDBLINKBITS-1];	   //controller_alive, always block just above this
+	// sean changes: LEDs active low unlike icestick
+	assign o_led3 = ~debounce_alive;                //otherLEDs[3];
+	assign o_led2 = ~mentor_alive;	               //otherLEDs[2];
+	assign o_led1 = ~blinky_alive;                  //otherLEDs[1];
+	assign o_led0 = ~redblinkct[REDBLINKBITS-1];	   //controller_alive, always block just above this
 
     // SYSCON ============================================================================================================================
     // Wishbone-like syscon responsible for clock and reset.
@@ -120,7 +121,7 @@ module prewish5k_controller(
         .STB_I(strobe),
 		.DAT_I(data),			//should be data - making this mask didn't fix the trouble
 		.o_alive(blinky_alive),
-		.o_led(the_led)
+		.o_led(~the_led)		//sean changes for active low - can you do this?
     );
 
 
