@@ -1,20 +1,59 @@
-# OK THIS IS GOING TO BE REALLY DIFFERENT BUT I DON'T KNOW HOW YET
-#***************** DEBUG THIS
-# but yeah, 48 pin package doesn't have pins 95-119 that I'm using.
-# maybe the button can still be pin 44! Time to find that upduino pinout.
-# indeed it looks like I can! Follow also osresearch's upduino_v2.pcf (in images folder atm)
-set_io the_led 95
-set_io o_led0 99
-set_io o_led1 98
-set_io o_led2 97
-set_io o_led3 96
-set_io i_clk 21
-set_io the_button 44
-set_io i_bit7 119
-set_io i_bit6 118
-set_io i_bit5 117
-set_io i_bit4 116
-set_io i_bit3 115
-set_io i_bit2 114
-set_io i_bit1 113
-set_io i_bit0 112
+# OK THIS IS GOING TO BE REALLY DIFFERENT FROM ICESTICK 
+# so the biggies are:
+# - i_clk is no longer a pin, I'll use the oscillator
+# - LEDs are active low.
+# here's the upduino_v2.pcf from osresearch with my changes
+
+# The LED pins are using the current controlled outputs
+# and are negative logic (write a 0 to turn on).
+set_io -nowarn led_r	41
+# sean changes from led_g
+set_io the_led	39
+set_io -nowarn led_b	40
+
+# FTDI chip, which sort of works
+set_io -nowarn serial_txd 14 # FPGA transmit to USB
+set_io -nowarn serial_rxd 15 # FPGA receive from USB
+set_io -nowarn spi_cs 16 # Drive high to ensure that the SPI flash is disabled
+# set_io serial_rts_n 14  # no?
+# set_io serial_dtr_n 16  # no?
+
+# Normal GPIO pins, left side
+# sean notes let's put our alive-LEDs here. make them active low to be consistent with the RGB one
+set_io -nowarn gpio_23 23
+set_io -nowarn gpio_25 25
+set_io -nowarn gpio_26 26
+set_io -nowarn gpio_27 27
+set_io -nowarn gpio_32 32
+set_io -nowarn gpio_35 35
+set_io -nowarn gpio_31 31
+set_io -nowarn gpio_37 37
+set_io -nowarn gpio_34 34
+set_io -nowarn gpio_43 43
+# these were gpio_36, 42, 38, 28
+set_io o_led0 36
+set_io o_led1 42
+set_io o_led2 38
+set_io o_led3 28
+
+# Normal GPIO pins, right side
+# sean adds let's try buttons on this side
+# these were set_io -nowarn gpio_12 gpio_21 gpio_13 gpio_19 gpio_18 gpio_11 gpio_9 gpio_6
+# start with dip lsb -> msb, skip 44 = global buffer
+# then button on pin 4
+set_io i_bit0 12
+set_io i_bit1 21
+set_io i_bit2 13
+set_io i_bit3 19
+set_io i_bit4 18
+set_io i_bit5 11
+set_io i_bit6 9
+set_io i_bit7 6
+set_io -nowarn gpio_44 44
+set_io the_button 4
+set_io -nowarn gpio_3 3
+set_io -nowarn gpio_48 48
+set_io -nowarn gpio_45 45
+set_io -nowarn gpio_47 47
+set_io -nowarn gpio_46 46
+set_io -nowarn gpio_2 2
