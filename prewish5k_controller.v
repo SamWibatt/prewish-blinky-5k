@@ -122,6 +122,10 @@ module prewish5k_controller(
 		.DAT_I(data),			//should be data - making this mask didn't fix the trouble
 		.o_alive(blinky_alive),
 		.o_led(~the_led)		//sean changes for active low - can you do this?
+		// i imagine not, it's not very lvaluey-looking. but a) I'm curious to see what this does
+		// and b) even if it doesn't work, I want to do the negating at this level so the modules
+		// can be active high everything. I could just declare another wire to use here, then
+		// assign the_led to ~that.
     );
 
 
