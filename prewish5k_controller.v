@@ -132,7 +132,7 @@ module prewish5k_controller(
       .DAT_O(button_state),
       .STB_I(debounce_in_strobe),
       .DAT_I(debounce_mask),
-      .i_button(~button_internal),      //launder active-low button to active-high signal like this
+	  .i_button(button_internal),      //active-low button laundered to active-high signal in top module
       .o_alive(debounce_alive)
     );
 
