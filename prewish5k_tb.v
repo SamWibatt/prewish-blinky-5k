@@ -21,7 +21,7 @@ module prewish5k_tb;
     wire led0, led1, led2, led3;    //other lights on the icestick
     reg mnt_stb=0;       //STB_I,   //then here is the student that takes direction from testbench
     reg[7:0] mnt_data=8'b00000000;  //DAT_I
-    reg[7:0] dipswitch_reg;
+    reg[7:0] dipswitch_reg=8'b1111_1111; //initial value to avoid X values at start; active low so all off.
     wire[7:0] dipswitch_wires = dipswitch_reg;
 
 
