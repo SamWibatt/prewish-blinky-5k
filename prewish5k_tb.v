@@ -1,43 +1,8 @@
-//this version is meant to use the prewish5k_controller instead of prewish5k_syscon
-//for doing sim of thing that will be put on the actual chip
-//the controller creates all the other modules
-
+//testbench is very much like top but we drive all the signals with assignments instead of THE REAL WORLD.
 `default_nettype	none
 
-//let's see if I can do 12 MHz
-//8.3333333333333333333333333333333e-8 seconds per tick
-// = 83.3 nanos, not real accurate
-// = 83,333 picos, close enough.
-//`timescale 83333ps/1ns
-// weird, seems you can only do 1 or 2 as the first digit.
-// can I do 100 nanos? That'd be in the ballpark but slow.
-// FIGURE OUT HOW TO DO THAT PLL THING OR WHATEVER so I can do this - if it ends up mattering.
-// kind of ok `timescale 100ns/10ns
-`timescale 100ns/100ns
-
-// THESE ARE MOCKUPS OF ICE40 BUILT IN MODULES THAT MAKE MY SIM.SH BUILD FAIL. GROSS BUT I WILL
-// FIGURE OUT HOW TO DO THIS RIGHT LATER (probably putting the device-specific stuff ... somewhere else.)
-//here's a cheap fake of the SB_GB module that the other tool chain uses
-//this lets it compile!
-module SB_GB(input USER_SIGNAL_TO_GLOBAL_BUFFER, output GLOBAL_BUFFER_OUTPUT);
-    assign GLOBAL_BUFFER_OUTPUT = USER_SIGNAL_TO_GLOBAL_BUFFER;
-endmodule
-
-//similar for pullup input pin
-/*
-SB_IO #(
-  .PIN_TYPE(6'b 0000_01),     //IS THIS RIGHT? looks like it's PIN_NO_OUTPUT | PIN_INPUT (not latched or registered)
-  .PULLUP(1'b 1)
-) button_input(
-  .PACKAGE_PIN(the_button),   //has to be a pin in bank 0,1,2
-  .D_IN_0(button_internal)
-);
-*/
-module SB_IO(input wire PACKAGE_PIN, output wire D_IN_0);
-  parameter PIN_TYPE = 0;
-  parameter PULLUP = 0;
-  assign D_IN_0 = PACKAGE_PIN;
-endmodule
+// not very realistic for 48MHz ... see if it works. Nope, 20 isn't a good one
+`timescale 10ns/10ns
 
 
 // Main module -----------------------------------------------------------------------------------------
@@ -52,24 +17,14 @@ module prewish5k_tb;
     wire[7:0] data;
     wire led;                       //active high LED
     reg buttonreg = 0;              // simulated button input
-    reg[7:0] dipswicth_reg = 0;     //simulated dip swicth input
+    wire buttonhi = ~buttonreg;     //assign! need active high for controller
     wire led0, led1, led2, led3;    //other lights on the icestick
     reg mnt_stb=0;       //STB_I,   //then here is the student that takes direction from testbench
     reg[7:0] mnt_data=8'b00000000;  //DAT_I
+    reg[7:0] dipswitch_reg;
+    wire[7:0] dipswitch_wires = dipswitch_reg;
 
-	//primitive for routing iceStick's onboard clock to a global buffer, which is good for clocks
-  //because GBs can drive a lot more little modules
-    wire CLK_O;
-	
-	//hx1k way
-	/*
-    SB_GB clk_gb (
-		.USER_SIGNAL_TO_GLOBAL_BUFFER(clk),
-		.GLOBAL_BUFFER_OUTPUT(CLK_O)             //can I use the output like this?
-    );
-	*/
 
-	//HOW DO WE SET UP A CLOCK?
 
     //module prewish5k_controller(
     //    input i_clk,
@@ -88,15 +43,8 @@ module prewish5k_tb;
     prewish5k_controller
         #(.NEWMASK_CLK_BITS(CTRL_MASK_CLK_BITS),.BLINKY_MASK_CLK_BITS(CTRL_MASK_CLK_BITS-7)) controller(
         .i_clk(clk),
-        .the_button(buttonreg),
-        .i_bit7(dipswicth_reg[7]),
-        .i_bit6(dipswicth_reg[6]),
-        .i_bit5(dipswicth_reg[5]),
-        .i_bit4(dipswicth_reg[4]),
-        .i_bit3(dipswicth_reg[3]),
-        .i_bit2(dipswicth_reg[2]),
-        .i_bit1(dipswicth_reg[1]),
-        .i_bit0(dipswicth_reg[0]),
+        .button_internal(buttonhi),
+        .dip_switch(dipswitch_wires),
         .the_led(led),
         .o_led0(led0),
         .o_led1(led1),
@@ -113,7 +61,7 @@ module prewish5k_tb;
 
     initial begin
         #0 buttonreg = 1;           //active low
-        #1 dipswicth_reg = 8'b01011111;         //user-swicthed mask. ACTIVE LOW. classic blink-blink
+        #1 dipswitch_reg = 8'b01011111;         //user-swicthed mask. ACTIVE LOW. classic blink-blink
         //drive button! Now we can do that
         #7 buttonreg = 0;
         #100 buttonreg = 1;
@@ -123,7 +71,7 @@ module prewish5k_tb;
         #19 buttonreg = 1;
 
         //then set up some new data
-        #1 dipswicth_reg = 8'b00110011;         //user-swicthed mask ACTIVE LOW. slower steady flash
+        #1 dipswitch_reg = 8'b00110011;         //user-swicthed mask ACTIVE LOW. slower steady flash
 
         // then one that does take, in order to toggle the LED
         #137 buttonreg = 0;

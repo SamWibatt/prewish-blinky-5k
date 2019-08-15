@@ -11,16 +11,8 @@
 // MAIN ********************************************************************************************************************************************
 module prewish5k_controller(
     input i_clk,
-    input the_button,       //active LOW button? Pulled up and inverted in here.
-    input i_bit7,           // dip swicth swicths, active low. Will pull up but not debounce.
-    input i_bit6,           
-    input i_bit5,           
-    input i_bit4,           
-    input i_bit3,           
-    input i_bit2,           
-    input i_bit1,           
-    input i_bit0,           
-
+    input button_internal,       //active high button. Pulled up and inverted in top module.
+    input wire[7:0] dip_switch,     // dip swicth swicths, active low, not inverted by top mod.
 	output the_led,			//this is THE LED, the green one that follows the pattern
 	output o_led0,			//these others are just the other LEDs on the board and they
 	output o_led1,          // act as "alive" indicators for the sub-modules.
@@ -28,7 +20,8 @@ module prewish5k_controller(
 	output o_led3
 );
 
-	
+
+	/* relocating to top module
     // INPUT BUTTON - after https://discourse.tinyfpga.com/t/internal-pullup-in-bx/800
     wire button_internal;
     SB_IO #(
@@ -38,19 +31,21 @@ module prewish5k_controller(
         .PACKAGE_PIN(the_button),   //has to be a pin in bank 0,1,2
         .D_IN_0(button_internal)
     );
+    */
 
+    /* moving to top module
     //dip switch wires and i/o with pullups
-    wire[7:0] dip_swicth;
+    wire[7:0] dip_switch;
     //can you do this with a for loop?
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit7_input(.PACKAGE_PIN(i_bit7),.D_IN_0(dip_swicth[7]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit6_input(.PACKAGE_PIN(i_bit6),.D_IN_0(dip_swicth[6]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit5_input(.PACKAGE_PIN(i_bit5),.D_IN_0(dip_swicth[5]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit4_input(.PACKAGE_PIN(i_bit4),.D_IN_0(dip_swicth[4]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit3_input(.PACKAGE_PIN(i_bit3),.D_IN_0(dip_swicth[3]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit2_input(.PACKAGE_PIN(i_bit2),.D_IN_0(dip_swicth[2]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit1_input(.PACKAGE_PIN(i_bit1),.D_IN_0(dip_swicth[1]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit0_input(.PACKAGE_PIN(i_bit0),.D_IN_0(dip_swicth[0]));
-
+    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit7_input(.PACKAGE_PIN(i_bit7),.D_IN_0(dip_switch[7]));
+    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit6_input(.PACKAGE_PIN(i_bit6),.D_IN_0(dip_switch[6]));
+    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit5_input(.PACKAGE_PIN(i_bit5),.D_IN_0(dip_switch[5]));
+    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit4_input(.PACKAGE_PIN(i_bit4),.D_IN_0(dip_switch[4]));
+    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit3_input(.PACKAGE_PIN(i_bit3),.D_IN_0(dip_switch[3]));
+    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit2_input(.PACKAGE_PIN(i_bit2),.D_IN_0(dip_switch[2]));
+    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit1_input(.PACKAGE_PIN(i_bit1),.D_IN_0(dip_switch[1]));
+    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit0_input(.PACKAGE_PIN(i_bit0),.D_IN_0(dip_switch[0]));
+    */
 
 	// Super simple "I'm Alive" blinky on one of the iceStick's red LEDs.
 	parameter REDBLINKBITS = 23;			// at 12 MHz this is ok
@@ -82,15 +77,6 @@ module prewish5k_controller(
 		if( RST_O )                 // active high RST_O
             rst_cnt <= rst_cnt + 1;
 
-	// should this be here?
-	//thing that makes this really use a clock routing thing
-	/* let's put in test bench...?
-    SB_GB clk_gb (
-		.USER_SIGNAL_TO_GLOBAL_BUFFER(i_clk),
-		.GLOBAL_BUFFER_OUTPUT(CLK_O)             //can I use the output like this?
-    );
-	*/
-	//instead do this until we have to put that back
 	assign CLK_O = i_clk;
 	// END SYSCON ========================================================================================================================
 
@@ -211,10 +197,10 @@ module prewish5k_controller(
                     // previous state waited for button release, this one waits for press.
                     if (button_state[0] == 1) begin
                         // invert bc dips active low
-                        mask[0] <= ~dip_swicth[0]; mask[1] <= ~dip_swicth[1];
-                        mask[2] <= ~dip_swicth[2]; mask[3] <= ~dip_swicth[3];
-                        mask[4] <= ~dip_swicth[4]; mask[5] <= ~dip_swicth[5];
-                        mask[6] <= ~dip_swicth[6]; mask[7] <= ~dip_swicth[7];
+                        mask[0] <= ~dip_switch[0]; mask[1] <= ~dip_switch[1];
+                        mask[2] <= ~dip_switch[2]; mask[3] <= ~dip_switch[3];
+                        mask[4] <= ~dip_switch[4]; mask[5] <= ~dip_switch[5];
+                        mask[6] <= ~dip_switch[6]; mask[7] <= ~dip_switch[7];
                         loadmask_state <= 2'b11;
 					end
 				end

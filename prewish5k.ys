@@ -2,5 +2,6 @@ read_verilog prewish5k_mentor.v
 read_verilog prewish5k_blinky.v
 read_verilog prewish5k_controller.v
 read_verilog prewish5k_debounce.v
-synth_ice40 -top prewish5k_controller
+read_verilog prewish5k_top.v
+synth_ice40 -top prewish5k_top
 write_json prewish5k.json

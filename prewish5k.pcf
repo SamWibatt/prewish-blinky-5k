@@ -1,10 +1,11 @@
-# OK THIS IS GOING TO BE REALLY DIFFERENT FROM ICESTICK 
+# OK THIS IS GOING TO BE REALLY DIFFERENT FROM ICESTICK
 # so the biggies are:
 # - i_clk is no longer a pin, I'll use the oscillator
 # - LEDs are active low.
 # here's the upduino_v2.pcf from osresearch with my changes
+# I will take -nowarn off all the ones I actually use
 
-# The LED pins are using the current controlled outputs
+# The RGB LED pins are using the current controlled outputs
 # and are negative logic (write a 0 to turn on).
 set_io -nowarn led_r	41
 # sean changes from led_g
