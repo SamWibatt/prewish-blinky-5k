@@ -3,6 +3,10 @@ Same as prewish-blinky, but for the Upduino v2.0 instead of the iceStick.
 
 I expect this to be largely identical to prewish-blinky. It should be the same except for pcf pin assignments, bits for clock dividers, global buffer and oscillator settings, etc. Platform-dependent stuff.
 
+It ended up needing a little bit of a refactor into the "top," which supplies the system clock. The testbench takes the place of "top" and just creates a clock with always #1 thing.
+
+As of 8/17/19, wired up and working!
+
 ----
 ### From [osresearch's up5k repository](https://github.com/osresearch/up5k):
 
