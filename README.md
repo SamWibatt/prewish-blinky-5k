@@ -1,5 +1,5 @@
 # prewish-blinky-5k
-Same as prewish-blinky, but for the Upduino v2.0 instead of the iceStick.
+Same as [prewish-blinky](https://github.com/SamWibatt/prewish-blinky), but for the Upduino v2.0 instead of the iceStick.
 
 I expect this to be largely identical to prewish-blinky. It should be the same except for pcf pin assignments, bits for clock dividers, global buffer and oscillator settings, etc. Platform-dependent stuff.
 
@@ -7,9 +7,19 @@ It ended up needing a little bit of a refactor into the "top," which supplies th
 
 As of 8/17/19, wired up and working!
 
+### note: I'm a beginner with programmable logic. If you are, too, be aware I'm not yet setting good examples. If you're an expert, I welcome your critiques!
+
+* platform: [Gnarly Grey Upduino V2.0](https://github.com/gtjennings1/UPDuino_v2_0) - [Sold here](http://www.gnarlygrey.com/)
+* toolchain: Icestorm - [github](https://github.com/cliffordwolf/icestorm), [home page](http://www.clifford.at/icestorm/)
+    * iverilog
+    * yosys
+    * nextpnr
+    * gtkwave
+* dev system: Ubuntu 18.04 laptop
+
 ## Building
 
-With icestorm, nextpnr, yosys, etc. in place - see prewish-blinky - run the following from the project directory:
+With icestorm, nextpnr, yosys, etc. in place - run the following from the project directory:
 
 ```
 ./build.sh
