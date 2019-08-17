@@ -4,8 +4,12 @@
 // Gisselquist's version from his tutorial's lesson 7 "bouncing"
 // with slight modifications
 module	debouncer(i_clk, i_btn, o_debounced);
-    parameter TIME_PERIOD = 100000;
-    parameter TIME_BITS = 17;
+    //icestick values, 12MHz clock
+    //parameter TIME_PERIOD = 100000;
+    //parameter TIME_BITS = 17;
+    //upduino v2 values, 48 MHz
+    parameter TIME_PERIOD = 400000;
+    parameter TIME_BITS = 19;
 	input	wire	i_clk, i_btn;
 	output	reg	o_debounced;
 

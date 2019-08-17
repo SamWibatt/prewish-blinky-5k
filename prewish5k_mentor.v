@@ -54,6 +54,7 @@ module prewish5k_mentor(
 
                 2'b11 : begin
                     //11 - lower STB_O, go to 00
+                    strobe_reg <= 0;
                     state <= 2'b00;         //had a thing where it went to 10
                 end
 

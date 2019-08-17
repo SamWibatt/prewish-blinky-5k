@@ -14,40 +14,13 @@ module prewish5k_controller(
     input button_internal,       //active high button. Pulled up and inverted in top module.
     input wire[7:0] dip_switch,     // dip swicth swicths, active low, not inverted by top mod.
 	output the_led,			//this is THE LED, the green one that follows the pattern
-	output o_led0,			//these others are just the other LEDs on the board and they
+	output o_led0,			//these others are just external and they
 	output o_led1,          // act as "alive" indicators for the sub-modules.
-	output o_led2,
+	output o_led2,          // All LED logic is active high and inverted; LEDs are all active low IRL
 	output o_led3
 );
 
-
-	/* relocating to top module
-    // INPUT BUTTON - after https://discourse.tinyfpga.com/t/internal-pullup-in-bx/800
-    wire button_internal;
-    SB_IO #(
-        .PIN_TYPE(6'b 0000_01),     // PIN_NO_OUTPUT | PIN_INPUT (not latched or registered)
-        .PULLUP(1'b 1)              // enable pullup and there's our active low
-    ) button_input(
-        .PACKAGE_PIN(the_button),   //has to be a pin in bank 0,1,2
-        .D_IN_0(button_internal)
-    );
-    */
-
-    /* moving to top module
-    //dip switch wires and i/o with pullups
-    wire[7:0] dip_switch;
-    //can you do this with a for loop?
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit7_input(.PACKAGE_PIN(i_bit7),.D_IN_0(dip_switch[7]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit6_input(.PACKAGE_PIN(i_bit6),.D_IN_0(dip_switch[6]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit5_input(.PACKAGE_PIN(i_bit5),.D_IN_0(dip_switch[5]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit4_input(.PACKAGE_PIN(i_bit4),.D_IN_0(dip_switch[4]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit3_input(.PACKAGE_PIN(i_bit3),.D_IN_0(dip_switch[3]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit2_input(.PACKAGE_PIN(i_bit2),.D_IN_0(dip_switch[2]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit1_input(.PACKAGE_PIN(i_bit1),.D_IN_0(dip_switch[1]));
-    SB_IO #(.PIN_TYPE(6'b 0000_01),.PULLUP(1'b 1)) bit0_input(.PACKAGE_PIN(i_bit0),.D_IN_0(dip_switch[0]));
-    */
-
-	// Super simple "I'm Alive" blinky on one of the iceStick's red LEDs.
+	// Super simple "I'm Alive" blinky on one of the external LEDs.
 	parameter REDBLINKBITS = 23;			// at 12 MHz this is ok
 	reg[REDBLINKBITS-1:0] redblinkct = 0;
 	always @(posedge i_clk) begin
@@ -59,7 +32,8 @@ module prewish5k_controller(
 	wire mentor_alive;
     wire debounce_alive;
 
-	// sean changes: LEDs active low unlike icestick
+	// sean changes: Upduino LEDs active low unlike icestick. Invert here to allow LED logic in the modules to remain
+    // active high.
 	assign o_led3 = ~debounce_alive;                //otherLEDs[3];
 	assign o_led2 = ~mentor_alive;	               //otherLEDs[2];
 	assign o_led1 = ~blinky_alive;                  //otherLEDs[1];
@@ -100,7 +74,7 @@ module prewish5k_controller(
     // actual blinky module
     // NEWMASK_CLK_BITS is a throwback to when masks were just chosen by a timer instead of USER INPUT!!!!
     // so need to get rid of it
-    parameter NEWMASK_CLK_BITS=28;		//default for "build"
+    parameter NEWMASK_CLK_BITS=30;		//was 28 for 12MHz clock - now 48MHz - default for "build"
 	parameter BLINKY_MASK_CLK_BITS = NEWMASK_CLK_BITS - 7;	//default for build, swh //3;			//default for short sim
 	wire acthi_led;		//the LED wire coming out from the blinky - we need to negate for active low
 	prewish5k_blinky #(.SYSCLK_DIV_BITS(BLINKY_MASK_CLK_BITS)) blinky (		//can I do this to cascade parameterization from controller decl in prewish5k_tb? looks like!

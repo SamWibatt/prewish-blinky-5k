@@ -58,6 +58,16 @@ module prewish5k_top(
 		.CLKHF(clk)
 	);
 
+    //***********************************************************************************************************
+    //***********************************************************************************************************
+    //***********************************************************************************************************
+    //HEY IN HERE PUT A CONTROL ON THE LED BRIGHTNESS BECAUSE THE GREEN IS REALLY REALLY BRIGHT by default
+    //on the Upduino
+    //SB_LED_DRV_CUR is probably what I need
+    //***********************************************************************************************************
+    //***********************************************************************************************************
+    //***********************************************************************************************************
+
     // was this for small simulation clocks prewish5k_controller #(.NEWMASK_CLK_BITS(9)) controller(
     // now let's try with real clock values, or as close as I can get - REAL ones take too long, but let's move it out more,
     // like have... 16 bits? default is 26, which is 1000 times longer.
@@ -65,7 +75,7 @@ module prewish5k_top(
     // passes it along? Let us try. We want a blinky mask clock to be about 3 full cycles of 8... let's say 32x as fast as newmask clk so 5 fewer bits?
     // let's try 6 - ok, that proportion looks not bad!
     // but in practice I did 7 - so let's do that here
-    parameter CTRL_MASK_CLK_BITS=30;      //is 28 default in controller, which was for 12MHz - so 30? try it.
+    parameter CTRL_MASK_CLK_BITS=30;      //is 28 default in controller, which was for 12MHz - so 30? try it. Good!
     prewish5k_controller
         #(.NEWMASK_CLK_BITS(CTRL_MASK_CLK_BITS),.BLINKY_MASK_CLK_BITS(CTRL_MASK_CLK_BITS-7))
         controller(
