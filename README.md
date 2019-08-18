@@ -5,6 +5,8 @@ I expect this to be largely identical to prewish-blinky. It should be the same e
 
 It ended up needing a little bit of a refactor into the "top," which supplies the system clock. The testbench takes the place of "top" and just creates a clock with always #1 thing.
 
+Also a **lot** of dimming of the onboard green LED - at max current that thing is blinding. I put it at minimum current via SB_RGBA_DRV module *and* PWMed it down to 1/8 duty before it was the unaggressive chill blink I wanted.
+
 As of 8/17/19, wired up and working!
 
 ### note: I'm a beginner with programmable logic. If you are, too, be aware I'm not yet setting good examples. If you're an expert, I welcome your critiques!
@@ -35,12 +37,14 @@ to send it to the device.
 
 ## Wiring
 
-**See pinout below**
+**See pinout below and prewish5k.pcf**
 
 ```
 Pin: Description
 
-39   the_led, Upduino v2.0's built-in RGB LED green. Active low.
+39   the_led, Upduino v2.0's built-in RGB LED green. Active low, driven by a SB_RGBA_DRV module in prewish5k_top.v
+40   led_b  - built-in RGB LED's blue. Not used in this test but pin/port needs to be known by the SB_RGBA_DRV
+41   led_r  - built-in RGB LED's red. Not used in this test but pin/port needs to be known by the SB_RGBA_DRV
 36   o_led0 - external LED for "alive" signaling/debugging. Active low. Requires current limiting resistor.
 42   o_led1 - same
 38   o_led2 - same
