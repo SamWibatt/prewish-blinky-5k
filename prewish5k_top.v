@@ -14,10 +14,10 @@ module prewish5k_top(
     input i_bit2,
     input i_bit1,
     input i_bit0,
-    output the_led,             //LEDs are also all active low. controller handles that.
+    output the_led,             //green LED, as I have this wired for Upduino. active high bc SB_RGBA_DRV is driving it
     output led_b,               //blue LED (in this version the_led is the RGB's green led)
     output led_r,               //red LED, similar
-    output o_led0,
+    output o_led0,              //alive-LEDs are all active low, controller does negation
     output o_led1,
     output o_led2,
     output o_led3
@@ -121,12 +121,12 @@ module prewish5k_top(
     reg led_b_reg = 0;
     SB_RGBA_DRV rgb (
       .RGBLEDEN (1'b1),         // enable LED
-      .RGB0PWM  (led_g_reg),    //these appear to be single-bit parameters
+      .RGB0PWM  (led_g_reg),    //these appear to be single-bit parameters. ordering determined by experimentation and may be wrong
       .RGB1PWM  (led_b_reg),    //driven from registers within counter arrays in every example I've seen
       .RGB2PWM  (led_r_reg),    //so I will do similar
       .CURREN   (1'b1),         // supply current; 0 shuts off the driver (verify)
-      .RGB0     (the_led),		//Actual Hardware connection - output wires. looks like it goes 0=blue
-      .RGB1     (led_b),    //was the_led),      //1 = green (though in practice it's showing blue on my board!)
+      .RGB0     (the_led),		//Actual Hardware connection - output wires. looks like it goes 0=green
+      .RGB1     (led_b),        //1 = blue 
       .RGB2     (led_r)         //2 = red - but verify
     );
     defparam rgb.CURRENT_MODE = "0b1";          //half current mode
@@ -156,9 +156,14 @@ module prewish5k_top(
         .o_led2(o_led2),
         .o_led3(o_led3)
     );
+    parameter PWMbits = 3;              // for dimming test, try having LED on only 1/2^PWMbits of the time
+    reg[PWMbits-1:0] pwmctr = 0;
     always @(posedge clk) begin
         //assign output of main blinky to the driver module
-        led_g_reg <= led_outwire;          //output from blinky is active high now , used to have ~led_outwire
+        //ok, even this is a little too bright.
+        //led_g_reg <= led_outwire;              //output from blinky is active high now , used to have ~led_outwire
+        led_g_reg <= (&pwmctr) & led_outwire;    //when counter is all ones, turn on (if we're in a blink)
+        pwmctr <= pwmctr + 1;
     end
 
 endmodule
