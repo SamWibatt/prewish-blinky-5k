@@ -15,6 +15,8 @@ module prewish5k_top(
     input i_bit1,
     input i_bit0,
     output the_led,             //LEDs are also all active low. controller handles that.
+    output led_b,               //blue LED (in this version the_led is the RGB's green led)
+    output led_r,               //red LED, similar
     output o_led0,
     output o_led1,
     output o_led2,
@@ -64,9 +66,74 @@ module prewish5k_top(
     //HEY IN HERE PUT A CONTROL ON THE LED BRIGHTNESS BECAUSE THE GREEN IS REALLY REALLY BRIGHT by default
     //on the Upduino
     //SB_LED_DRV_CUR is probably what I need
+    //or maybe not
+    // See Private/elec/FPGA/SBTICETechnologyLibrary201504.pdf, the SiliconBlue ICE Technology doc,
+    // re: https://github.com/gtjennings1/UPDuino_v2_0/blob/master/RGB_LED_BLINK_20170606/RGB_LED_BLINK.v primitive
+    // SB_RGBA_DRV
+    // GGrey's use is in a blinker, so the PWM varies based on system clock, thus
+    // module RGB_LED_BLINK
+    // (
+    //     // outputs
+    //     output  wire        REDn,       // Red
+    //     output  wire        BLUn,       // Blue
+    //     output  wire        GRNn        // Green
+    // );
+    // [...]
+    // SB_RGBA_DRV RGB_DRIVER (
+    //   .RGBLEDEN (1'b1),
+    //   .RGB0PWM  (frequency_counter_i[25]&frequency_counter_i[24]),
+    //   .RGB1PWM  (frequency_counter_i[25]&~frequency_counter_i[24]),
+    //   .RGB2PWM  (~frequency_counter_i[25]&frequency_counter_i[24]),
+    //   .CURREN   (1'b1),
+    //   .RGB0     (REDn),		//Actual Hardware connection
+    //   .RGB1     (GRNn),
+    //   .RGB2     (BLUn)
+    // );
+    // defparam RGB_DRIVER.RGB0_CURRENT = "0b000001";
+    // defparam RGB_DRIVER.RGB1_CURRENT = "0b000001";
+    // defparam RGB_DRIVER.RGB2_CURRENT = "0b000001";
     //***********************************************************************************************************
     //***********************************************************************************************************
     //***********************************************************************************************************
+    // see also https://blog.idorobots.org/entries/upduino-fpga-tutorial.html for how they did it
+    /*
+
+       SB_RGBA_DRV rgb (
+         .RGBLEDEN (1'b1),
+         .RGB0PWM  (counter[N]),
+         .RGB1PWM  (counter[N-1]),
+         .RGB2PWM  (counter[N-2]),
+         .CURREN   (1'b1),
+         .RGB0     (led_blue),
+         .RGB1     (led_green),
+         .RGB2     (led_red)
+       );
+       defparam rgb.CURRENT_MODE = "0b1";
+       defparam rgb.RGB0_CURRENT = "0b000001";
+       defparam rgb.RGB1_CURRENT = "0b000001";
+       defparam rgb.RGB2_CURRENT = "0b000001";
+    */
+    wire led_b, led_r;
+    //looks like the pwm parameters like registers - not quite sure how they work, but let's
+    //just create some registers and treat them as active-high ... Well, we'll see what we get.
+    reg led_r_reg = 0;
+    reg led_g_reg = 0;
+    reg led_b_reg = 0;
+    SB_RGBA_DRV rgb (
+      .RGBLEDEN (1'b1),         // enable LED
+      .RGB0PWM  (led_g_reg),    //these appear to be single-bit parameters
+      .RGB1PWM  (led_b_reg),    //driven from registers within counter arrays in every example I've seen
+      .RGB2PWM  (led_r_reg),    //so I will do similar
+      .CURREN   (1'b1),         // supply current; 0 shuts off the driver (verify)
+      .RGB0     (the_led),		//Actual Hardware connection - output wires. looks like it goes 0=blue
+      .RGB1     (led_b),    //was the_led),      //1 = green (though in practice it's showing blue on my board!)
+      .RGB2     (led_r)         //2 = red - but verify
+    );
+    defparam rgb.CURRENT_MODE = "0b1";          //half current mode
+    defparam rgb.RGB0_CURRENT = "0b000001";     //4mA for Full Mode; 2mA for Half Mode
+    defparam rgb.RGB1_CURRENT = "0b000001";     //see SiliconBlue ICE Technology doc
+    defparam rgb.RGB2_CURRENT = "0b000001";
+
 
     // was this for small simulation clocks prewish5k_controller #(.NEWMASK_CLK_BITS(9)) controller(
     // now let's try with real clock values, or as close as I can get - REAL ones take too long, but let's move it out more,
@@ -76,17 +143,22 @@ module prewish5k_top(
     // let's try 6 - ok, that proportion looks not bad!
     // but in practice I did 7 - so let's do that here
     parameter CTRL_MASK_CLK_BITS=30;      //is 28 default in controller, which was for 12MHz - so 30? try it. Good!
+    wire led_outwire;
     prewish5k_controller
         #(.NEWMASK_CLK_BITS(CTRL_MASK_CLK_BITS),.BLINKY_MASK_CLK_BITS(CTRL_MASK_CLK_BITS-7))
         controller(
         .i_clk(clk),
         .button_internal(button_acthi),          //will this work?
         .dip_switch(dip_swicth),
-        .the_led(the_led),
+        .the_led(led_outwire),                   //was the_led), now the driver above is doing that
         .o_led0(o_led0),
         .o_led1(o_led1),
         .o_led2(o_led2),
         .o_led3(o_led3)
     );
+    always @(posedge clk) begin
+        //assign output of main blinky to the driver module
+        led_g_reg <= led_outwire;          //output from blinky is active high now , used to have ~led_outwire
+    end
 
 endmodule
