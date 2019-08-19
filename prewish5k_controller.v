@@ -163,10 +163,13 @@ module prewish5k_controller(
                     // previous state waited for button release, this one waits for press.
                     if (button_state[0] == 1) begin
                         // invert bc dips active low
-                        mask[0] <= ~dip_switch[0]; mask[1] <= ~dip_switch[1];
-                        mask[2] <= ~dip_switch[2]; mask[3] <= ~dip_switch[3];
-                        mask[4] <= ~dip_switch[4]; mask[5] <= ~dip_switch[5];
-                        mask[6] <= ~dip_switch[6]; mask[7] <= ~dip_switch[7];
+                        //mask[0] <= ~dip_switch[0]; mask[1] <= ~dip_switch[1];
+                        //mask[2] <= ~dip_switch[2]; mask[3] <= ~dip_switch[3];
+                        //mask[4] <= ~dip_switch[4]; mask[5] <= ~dip_switch[5];
+                        //mask[6] <= ~dip_switch[6]; mask[7] <= ~dip_switch[7];
+                        //can I do this?
+                        mask <= {~dip_switch[0],~dip_switch[1],~dip_switch[2],~dip_switch[3],
+                                 ~dip_switch[4],~dip_switch[5],~dip_switch[6],~dip_switch[7]};
                         loadmask_state <= 2'b11;
 					end
 				end
