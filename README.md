@@ -1,4 +1,5 @@
 # prewish-blinky-5k
+
 Same as [prewish-blinky](https://github.com/SamWibatt/prewish-blinky), but for the Upduino v2.0 instead of the iceStick.
 
 I expect this to be largely identical to prewish-blinky. It should be the same except for pcf pin assignments, bits for clock dividers, global buffer and oscillator settings, etc. Platform-dependent stuff.
@@ -8,6 +9,8 @@ It ended up needing a little bit of a refactor into the "top," which supplies th
 Also a **lot** of dimming of the onboard green LED - at max current that thing is blinding. I put it at minimum current via SB_RGBA_DRV module *and* PWMed it down to 1/8 duty before it was the unaggressive chill blink I wanted.
 
 As of 8/17/19, wired up and working!
+
+# Danger: wiring for DIP switch may be backwards, or I wired it backwards on my board, s.t. switch 0 is the MSB (and shows first) and switch 7 LSB, so asymmetrical e.g. 10110000 looks like long before short - MAKE SURE PIN DESCRIPTIONS ARE RIGHT, bc can fix with reordering the pcf, if the error is in the design and not my wiring.
 
 ### note: I'm a beginner with programmable logic. If you are, too, be aware I'm not yet setting good examples. If you're an expert, I welcome your critiques!
 
