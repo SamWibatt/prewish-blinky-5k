@@ -19,6 +19,8 @@ device="up5k"
 # in the nextpnr/ice40/main.cc file, look for the word "package."
 package="sg48"
 
+# ok here if we don't have any arguments do the build-bin version
+
 # yosys produces the .json file from all the verilog sources. See the .ys file for details.
 yosys "$proj".ys
 
@@ -34,3 +36,4 @@ icepack "$proj".asc "$proj".bin
 # to send the binary to the chip.
 # iceprog -v shows LOTS of info
 # you may have to sudo.
+
