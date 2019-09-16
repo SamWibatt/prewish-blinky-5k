@@ -10,7 +10,7 @@
 # need to bring red and blue in for the SB_RGBA_DRV
 set_io led_r	41
 # sean changes from led_g
-set_io the_led	39
+set_io top_alive_led	39
 set_io led_b	40
 
 # FTDI chip, which sort of works
@@ -41,7 +41,7 @@ set_io o_led3 28
 # Normal GPIO pins, right side
 # sean adds let's try buttons on this side
 # these were set_io -nowarn gpio_12 gpio_21 gpio_13 gpio_19 gpio_18 gpio_11 gpio_9 gpio_6
-# start with dip lsb -> msb, skip 44 = global buffer
+# then were start with dip lsb -> msb, skip 44 = global buffer
 # then button on pin 4
 set_io i_bit0 12
 set_io i_bit1 21
